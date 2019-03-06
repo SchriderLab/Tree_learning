@@ -20,5 +20,5 @@ These scripts generate control files for MSA simulation with (INDEL001) and with
 These scripts generate control files for MSA simulation with (INDEL001) and without (NOINDEL) indels/gaps. The scripts will generate FA, FAT, FE, and SHORTINT directories each with topo1, topo2 and topo3 subdirectories. These correspond to heterogenious branch length regions,namely Farris zone (FA), Felsenstein zone (FE), ["Twisted" Farris zone](https://www.sciencedirect.com/science/article/pii/S1055790315002316?via%3Dihub) (FAT) and Short internal branch (SHORTINT). These MSAs were used to test performance of different tree inference methods.
 
 4) [indelible_controlgen_INDEL001_WARNOW.R](https://github.com/SchriderLab/Tree_learning/blob/master/INDELible/indelible_controlgen_INDEL001_WARNOW.R)   
-This script generates control files for MSA simulation with no subsitutions, only indels. These MSAs were used to test performance of different tree inference methods.  
+This script generates control files for MSA simulation with no subsitutions, only indels. This is the secenario under wich maximum likelihood (ML) tree inference has been shown to be statistically inconsistent ([Warnow, 2012](http://currents.plos.org/treeoflife/index.html%3Fp=1609.html))  These MSAs were used to test performance of different tree inference methods.  
 
