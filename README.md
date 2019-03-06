@@ -6,6 +6,6 @@ R scripts can be found in INDELible directory
 
 required R packages: 
 [phangorn](https://cran.r-project.org/web/packages/phangorn/index.html)
-MCMCpack https://cran.r-project.org/web/packages/MCMCpack/index.html
-dplyr https://cran.r-project.org/web/packages/dplyr/index.html
-scales https://cran.r-project.org/web/packages/scales/index.html
+[MCMCpack](https://cran.r-project.org/web/packages/MCMCpack/index.html)
+[dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)
+[scales](https://cran.r-project.org/web/packages/scales/index.html)
