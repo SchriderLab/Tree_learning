@@ -110,9 +110,9 @@ def build_standartCNN(X_train, Y_train, X_valid, Y_valid, Ntaxa,conv_pool_n,filt
 
 def main():
     parser = argparse.ArgumentParser(description='Keras run')
-    parser.add_argument( '-t', help = "Training dataset in FASTA",dest='TRAIN')
-    parser.add_argument( '-v', help = "Validation dataset in FASTA",dest='VALID')
-    parser.add_argument( '--test', help = "Test dataset in FASTA",dest='TEST')
+    parser.add_argument( '-t', help = "Training dataset in .npy",dest='TRAIN')
+    parser.add_argument( '-v', help = "Validation dataset in .npy",dest='VALID')
+    parser.add_argument( '--test', help = "Test dataset in .npy",dest='TEST')
     parser.add_argument( '-N', help = "N taxa", type=int, dest='Ntaxa')
     args = parser.parse_args()
     
