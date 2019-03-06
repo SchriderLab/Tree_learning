@@ -4,7 +4,7 @@ This repository contains R and Python scripts that were used in the project ["Ac
 
 R scripts can be found in [INDELible directory](https://github.com/SchriderLab/Tree_learning/tree/master/INDELible). They will generate various control files for [INDElible](http://abacus.gene.ucl.ac.uk/software/indelible/) program that simulates MSAs under given tree topology, branch lengths and different substitution as well as indel model parameters.  
 
-Required R packages:  
+Required CRAN R packages:  
 [phangorn](https://cran.r-project.org/web/packages/phangorn/index.html)   
 [MCMCpack](https://cran.r-project.org/web/packages/MCMCpack/index.html)  
 [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)  
