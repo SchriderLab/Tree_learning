@@ -11,4 +11,6 @@ Required R packages:
 [scales](https://cran.r-project.org/web/packages/scales/index.html)  
 
 1) [indelible_controlgen_INDEL001.R](https://github.com/SchriderLab/Tree_learning/blob/master/INDELible/indelible_controlgen_INDEL001.R) and [indelible_controlgen_NOINDEL.R](https://github.com/SchriderLab/Tree_learning/blob/master/INDELible/indelible_controlgen_NOINDEL.R)    
-These scripts generate control files for MSA simulation with (INDEL001) and without (NOINDEL) indels/gaps. The control files will be stored    
+These scripts generate control files for MSA simulation with (INDEL001) and without (NOINDEL) indels/gaps. The control files will be stored in three directories (topo1, topo2 and topo3) that correspond to three topologies. These scripts are used to generate MSAs for generating TRAINING, VVALIDATION and test data sets. 
+
+2) 
