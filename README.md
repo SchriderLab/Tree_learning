@@ -4,7 +4,7 @@ This repository contains R and Phython scripts that were used in the project "Ac
 
 R scripts can be found in INDELible directory 
 
-required R packages: 
+Required R packages: 
 [phangorn](https://cran.r-project.org/web/packages/phangorn/index.html)
 [MCMCpack](https://cran.r-project.org/web/packages/MCMCpack/index.html)
 [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)
