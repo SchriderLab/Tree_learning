@@ -45,7 +45,8 @@ Example: ```keras_CNN_TOPO.py -t TRAIN.npy -v VALID.npy  --test TEST.npy  -N 4``
   ```
 
 2) [keras_CNN_apply.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_apply.py)  
-This script infers a tree from an MSA. It requires keras model and weights files produced by [keras_CNN_TOPO.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_TOPO.py), a data set in FASTA format. Example: ```keras_CNN_apply.py -t TEST.fasta -w best_weights_clas -k keras_model.h5 -N 4```
+This script infers a tree from an MSA. It requires keras model and weights files produced by [keras_CNN_TOPO.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_TOPO.py), a data set in FASTA format.  
+Example: ```keras_CNN_apply.py -t TEST.fasta -w best_weights_clas -k keras_model.h5 -N 4```
 ```
 Options:
   -h, --help 
@@ -55,7 +56,8 @@ Options:
   -N N taxa
 ```
 3) [keras_CNN_BOOT.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_BOOT.py)  
-This script performs MSA nonparametric bootstrapping. It requires keras model and weights files produced by [keras_CNN_TOPO.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_TOPO.py), a data set in FASTA format and labeles for  data set. Example: ```keras_CNN_BOOT.py --test TEST.fasta --lab labels.txt -w best_weights_clas -k keras_model.h5 -b 100 -N 4```   
+This script performs MSA nonparametric bootstrapping. It requires keras model and weights files produced by [keras_CNN_TOPO.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_TOPO.py), a data set in FASTA format and labeles for  data set.   
+Example: ```keras_CNN_BOOT.py --test TEST.fasta --lab labels.txt -w best_weights_clas -k keras_model.h5 -b 100 -N 4```   
 ```
 Options:
   -h, --help
