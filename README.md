@@ -9,3 +9,6 @@ Required R packages:
 [MCMCpack](https://cran.r-project.org/web/packages/MCMCpack/index.html)  
 [dplyr](https://cran.r-project.org/web/packages/dplyr/index.html)  
 [scales](https://cran.r-project.org/web/packages/scales/index.html)  
+
+1) indelible_controlgen_INDEL001.R and indelible_controlgen_NOINDEL.R    
+These scripts generate control files for MSA simulation with (INDEL001) and without (NOINDEL) indels/gaps. The control files will be stored    
