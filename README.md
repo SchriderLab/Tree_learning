@@ -30,6 +30,9 @@ E.g.
 ```
 cat topo1/* topo2/* topo3/* > TRAINING
 ```
+The keras model (keras.h5) and CNN weights will be outputted by the script after testing is completed.
 
+2) [keras_CNN_apply.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_apply.py)
+This script infers a tree from an MSA. It requires keras model and weights files produced by [keras_CNN_TOPO.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_TOPO.py).   
 
 
