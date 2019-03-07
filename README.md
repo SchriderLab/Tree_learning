@@ -71,4 +71,4 @@ Options:
   -b N bootstrap replicates
   -N N taxa
 ```
-Python scripts that were used to reconstruct error serface are avalible [here](https://github.com/SchriderLab/error_surface).  
+Python scripts that were used to reconstruct error surface are avalible [here](https://github.com/SchriderLab/error_surface).  
