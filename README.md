@@ -55,7 +55,7 @@ Options:
   -h, --help 
   -t Evaluation dataset in FASTA
   -w Weights file
-  -k Keras model JASON
+  -k Keras model
   -N N taxa
 ```
 3) [keras_CNN_BOOT.py](https://github.com/SchriderLab/Tree_learning/blob/master/KERAS/keras_CNN_BOOT.py)  
