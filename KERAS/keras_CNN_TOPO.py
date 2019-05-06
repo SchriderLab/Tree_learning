@@ -2,6 +2,7 @@
 import tensorflow as tf
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 import pandas
+import time
 from itertools import product
 import sys, argparse, os
 import numpy as np
@@ -133,15 +134,22 @@ def main():
     
     #Model Run
     #Classification TOPO
+    starttime=time.time()
     model_cnn=build_standartCNN(X_train=train_data1, Y_train=train_label, X_valid=valid_data1, Y_valid=valid_label,Ntaxa=args.Ntaxa,conv_pool_n=8,filter_n=500,droput_rates=0.20,batch_sizes=200)
     #Load best model
     model_cnn.load_weights('best_weights_clas')
     model_cnn.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
     model_cnn.save("keras_model.h5")
+    endtime=time.time()
+    print(endtime-starttime,"sec for training")
     print('Evaluate with best class weights')
    
+
+    starttime=time.time()
     evals = model_cnn.evaluate(test_data1,test_label,batch_size=100, verbose=1, steps=None)
     classes = model_cnn.predict(test_data1, batch_size=100, verbose=1, steps=None)
+    endtime=time.time()
+    print(endtime-starttime,"sec for testing")
     np.savetxt("test.evals_class.txt",evals,fmt='%f')
     np.savetxt("test.classprobs_class.txt",classes,fmt='%f')
     class_lab = classes.argmax(axis=-1)
