@@ -7,6 +7,7 @@ library('phangorn')
 library('MCMCpack')
 library('dplyr')
 library('scales')
+library('RGeode')
 options(scipen=999)
 #Model block generating function
 model_gen=function(modelset,file)
@@ -50,12 +51,12 @@ model_gen=function(modelset,file)
   return(models_selected)
 }
 #TREE generating function 
-tree_gen=function(tr,n_sim,parameter)
+tree_gen=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(rbeta(n_sim,parameter,parameter),ncol=nbranch)
+  boot=matrix(rexptr(nbranch*n_sim,10,c(0,0.5)),ncol=nbranch)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -63,9 +64,55 @@ tree_gen=function(tr,n_sim,parameter)
   tree_list=as.vector(apply(trees,1,paste,collapse=""))
   return(tree_list)
 }  
-
-
 tree_genFA=function(tr,n_sim)
+{
+  nbranch=length(tr$edge[,1])
+  tr$edge.lengths=rep(0,nbranch)
+  tr_newick=unlist(strsplit(write.tree(tr),""))
+  boot=matrix(runif(nbranch*n_sim,c(0.5,0.5,0,0,0,0,0,0,0.5,0.5),c(1,1,0.05,0.05,0.05,0.05,0.05,0.05,1,1)),ncol=5,byrow=T)
+  pos=which(tr_newick==0)
+  trees=data.frame(t(tr_newick))
+  trees=trees[rep(1,n_sim),]
+  trees[,pos]=boot[,1:5]
+  tree_list=as.vector(apply(trees,1,paste,collapse=""))
+  return(tree_list)
+}
+
+tree_genTFA=function(tr,n_sim)
+{
+  nbranch=length(tr$edge[,1])
+  tr$edge.lengths=rep(0,nbranch)
+  tr_newick=unlist(strsplit(write.tree(tr),""))
+  B1=runif(n_sim,0.5,1)
+  B3=runif(n_sim,0,0.05) 
+  B2=B1+B3
+  B4=2*B3
+  B5=B3
+  boot=cbind(B1,B2,B3,B4,B5)
+  pos=which(tr_newick==0)
+  trees=data.frame(t(tr_newick))
+  trees=trees[rep(1,n_sim),]
+  trees[,pos]=boot[,1:5]
+  tree_list=as.vector(apply(trees,1,paste,collapse=""))
+  return(tree_list)
+}
+
+tree_genFE=function(tr,n_sim)
+{
+  nbranch=length(tr$edge[,1])
+  tr$edge.lengths=rep(0,nbranch)
+  tr_newick=unlist(strsplit(write.tree(tr),""))
+  boot=matrix(runif(nbranch*n_sim,c(0.5,0,0,0.5,0,0.5,0,0,0,0.5,0,0.5,0,0.5,0,0,0.5,0,0,0.5),c(1,0.05,0.05,1,0.05,1,0.05,0.05,0.05,1,0.05,1,0.05,1,0.05,0.05,1,0.05,0.05,1)),ncol=5,byrow=T)
+  pos=which(tr_newick==0)
+  trees=data.frame(t(tr_newick))
+  trees=trees[rep(1,n_sim),]
+  trees[,pos]=boot[,1:5]
+  tree_list=as.vector(apply(trees,1,paste,collapse=""))
+  return(tree_list)
+}
+
+
+tree_genEFA=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
@@ -78,7 +125,7 @@ tree_genFA=function(tr,n_sim)
   tree_list=as.vector(apply(trees,1,paste,collapse=""))
   return(tree_list)
 }
-tree_genFE=function(tr,n_sim)
+tree_genEFE=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)

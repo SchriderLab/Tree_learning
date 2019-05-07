@@ -20,7 +20,7 @@ model_gen=function(modelset,file)
     write(paste('\n[MODEL] ',model,'Model',model_id,sep = ''),file,append=T)
     model=model
     model_id=model_id+1
-    write(paste(' [submodel] ',paste(model,collapse=' '),'\n [rates] ',1,' ',0,' 0','\n [indelmodel] POW 1.5 50\n [indelrate] 0.01'),file,append=T)
+    write(paste(' [submodel] ',paste(model,collapse=' '),'\n [rates] ',0,' ',0,' 0','\n [indelmodel] POW 1.5 50\n [indelrate] 0.01'),file,append=T)
     
   }
   return(models_selected)
@@ -76,5 +76,3 @@ for (r in c("WARNOW"))
 {  
   indelib_gen(as.numeric(args[1]),as.numeric(args[2]),as.numeric(args[3]),as.numeric(args[4]),r)
 }
-
-

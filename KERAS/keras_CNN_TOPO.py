@@ -135,7 +135,7 @@ def main():
     #Model Run
     #Classification TOPO
     starttime=time.time()
-    model_cnn=build_standartCNN(X_train=train_data1, Y_train=train_label, X_valid=valid_data1, Y_valid=valid_label,Ntaxa=args.Ntaxa,conv_pool_n=8,filter_n=500,droput_rates=0.20,batch_sizes=200)
+    model_cnn=build_standartCNN(X_train=train_data1, Y_train=train_label, X_valid=valid_data1, Y_valid=valid_label,Ntaxa=args.Ntaxa,conv_pool_n=8,filter_n=500,droput_rates=0.20,batch_sizes=100)
     #Load best model
     model_cnn.load_weights('best_weights_clas')
     model_cnn.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
