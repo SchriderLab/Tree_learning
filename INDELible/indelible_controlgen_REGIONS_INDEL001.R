@@ -51,7 +51,7 @@ model_gen=function(modelset,file)
   return(models_selected)
 }
 #TREE generating function 
-tree_gen=function(tr,n_sim)
+tree_genEXP=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
@@ -64,12 +64,13 @@ tree_gen=function(tr,n_sim)
   tree_list=as.vector(apply(trees,1,paste,collapse=""))
   return(tree_list)
 }  
+
 tree_genFA=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0.5,0.5,0,0,0,0,0,0,0.5,0.5),c(1,1,0.05,0.05,0.05,0.05,0.05,0.05,1,1)),ncol=5,byrow=T)
+  boot=matrix(runif(nbranch*n_sim,c(0.1,0.1,0,0,0,0,0,0,0.1,0.1),c(0.5,0.5,0.05,0.05,0.05,0.05,0.05,0.05,0.5,0.5)),ncol=5,byrow=T)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -78,12 +79,12 @@ tree_genFA=function(tr,n_sim)
   return(tree_list)
 }
 
-tree_genTFA=function(tr,n_sim)
+tree_genFAT=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  B1=runif(n_sim,0.5,1)
+  B1=runif(n_sim,0.1,0.5)
   B3=runif(n_sim,0,0.05) 
   B2=B1+B3
   B4=2*B3
@@ -97,12 +98,26 @@ tree_genTFA=function(tr,n_sim)
   return(tree_list)
 }
 
+tree_genFAE=function(tr,n_sim)
+{
+  nbranch=length(tr$edge[,1])
+  tr$edge.lengths=rep(0,nbranch)
+  tr_newick=unlist(strsplit(write.tree(tr),""))
+  boot=matrix(runif(nbranch*n_sim,c(0.1,0.1,0,0,0,0,0,0,0.1,0.1),c(0.5,0.5,0.5,0.05,0.05,0.05,0.05,0.5,0.5,0.5)),ncol=5,byrow=T)
+  pos=which(tr_newick==0)
+  trees=data.frame(t(tr_newick))
+  trees=trees[rep(1,n_sim),]
+  trees[,pos]=boot[,1:5]
+  tree_list=as.vector(apply(trees,1,paste,collapse=""))
+  return(tree_list)
+}
+
 tree_genFE=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0.5,0,0,0.5,0,0.5,0,0,0,0.5,0,0.5,0,0.5,0,0,0.5,0,0,0.5),c(1,0.05,0.05,1,0.05,1,0.05,0.05,0.05,1,0.05,1,0.05,1,0.05,0.05,1,0.05,0.05,1)),ncol=5,byrow=T)
+  boot=matrix(runif(nbranch*n_sim,c(0.1,0,0,0.1,0,0.1,0,0,0,0.1,0,0.1,0,0.1,0,0,0.1,0,0,0.1),c(0.5,0.05,0.05,0.5,0.05,0.5,0.05,0.05,0.05,0.5,0.05,0.5,0.05,0.5,0.05,0.05,0.5,0.05,0.05,0.5)),ncol=5,byrow=T)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -112,25 +127,12 @@ tree_genFE=function(tr,n_sim)
 }
 
 
-tree_genEFA=function(tr,n_sim)
+tree_genFEE=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0.5,0.5,0,0,0,0,0,0,0.5,0.5),c(1,1,1,0.05,0.05,0.05,0.05,1,1,1)),ncol=5,byrow=T)
-  pos=which(tr_newick==0)
-  trees=data.frame(t(tr_newick))
-  trees=trees[rep(1,n_sim),]
-  trees[,pos]=boot[,1:5]
-  tree_list=as.vector(apply(trees,1,paste,collapse=""))
-  return(tree_list)
-}
-tree_genEFE=function(tr,n_sim)
-{
-  nbranch=length(tr$edge[,1])
-  tr$edge.lengths=rep(0,nbranch)
-  tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0.5,0,0,0.5,0,0.5,0,0,0,0.5,0,0.5,0,0.5,0,0,0.5,0,0,0.5),c(1,0.05,1,1,0.05,1,0.05,1,0.05,1,0.05,1,1,1,0.05,0.05,1,1,0.05,1)),ncol=5,byrow=T)
+  boot=matrix(runif(nbranch*n_sim,c(0.1,0,0,0.1,0,0.1,0,0,0,0.1,0,0.1,0,0.1,0,0,0.1,0,0,0.1),c(0.5,0.05,0.5,0.5,0.05,0.5,0.05,0.5,0.05,0.5,0.05,0.5,0.5,0.5,0.05,0.05,0.5,0.5,0.05,0.5)),ncol=5,byrow=T)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -139,26 +141,13 @@ tree_genEFE=function(tr,n_sim)
   return(tree_list)
 }
 
-tree_genSHORT=function(tr,n_sim)
-{
-  nbranch=length(tr$edge[,1])
-  tr$edge.lengths=rep(0,nbranch)
-  tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0,0,0,0,0),c(0.05,0.05,1,0.05,0.05)),ncol=5,byrow=T)
-  pos=which(tr_newick==0)
-  trees=data.frame(t(tr_newick))
-  trees=trees[rep(1,n_sim),]
-  trees[,pos]=boot[,1:5]
-  tree_list=as.vector(apply(trees,1,paste,collapse=""))
-  return(tree_list)
-}
 
 tree_genLONG=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0.5,0.5,0,0.5,0.5),c(1,1,1,1,1)),ncol=5,byrow=T)
+  boot=matrix(runif(nbranch*n_sim,c(0.1,0.1,0,0.1,0.1),c(0.5,0.5,0.5,0.5,0.5)),ncol=5,byrow=T)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -172,7 +161,7 @@ tree_genLONGOUT=function(tr,n_sim)
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0.5,0,0,0,0,0,0.5,0,0,0,0,0,0,0.5,0,0,0,0,0,0.5),c(1,0.05,1,0.05,0.05,0.05,1,1,0.05,0.05,0.05,0.05,1,1,0.05,0.05,0.05,1,0.05,1)),ncol=5,byrow=T)
+  boot=matrix(runif(nbranch*n_sim,c(0.1,0,0,0,0,0,0.1,0,0,0,0,0,0,0.1,0,0,0,0,0,0.1),c(0.5,0.05,0.5,0.05,0.05,0.05,0.5,0.5,0.05,0.05,0.05,0.05,0.5,0.5,0.05,0.05,0.05,0.5,0.05,0.5)),ncol=5,byrow=T)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -181,12 +170,43 @@ tree_genLONGOUT=function(tr,n_sim)
   return(tree_list)
 }
 
+tree_genLONGULTRA=function(tr,n_sim)
+{
+  nbranch=length(tr$edge[,1])
+  tr$edge.lengths=rep(0,nbranch)
+  tr_newick=unlist(strsplit(write.tree(tr),""))
+  boot=matrix(runif(nbranch*n_sim,c(0.5,0.5,0,0.5,0.5),c(1,1,1,1,1)),ncol=5,byrow=T)
+  pos=which(tr_newick==0)
+  trees=data.frame(t(tr_newick))
+  trees=trees[rep(1,n_sim),]
+  trees[,pos]=boot[,1:5]
+  tree_list=as.vector(apply(trees,1,paste,collapse=""))
+  return(tree_list)
+}
+
+
+tree_genSHORT=function(tr,n_sim)
+{
+  nbranch=length(tr$edge[,1])
+  tr$edge.lengths=rep(0,nbranch)
+  tr_newick=unlist(strsplit(write.tree(tr),""))
+  boot=matrix(runif(nbranch*n_sim,c(0,0,0,0,0),c(0.05,0.05,0.5,0.05,0.05)),ncol=5,byrow=T)
+  pos=which(tr_newick==0)
+  trees=data.frame(t(tr_newick))
+  trees=trees[rep(1,n_sim),]
+  trees[,pos]=boot[,1:5]
+  tree_list=as.vector(apply(trees,1,paste,collapse=""))
+  return(tree_list)
+}
+
+
+
 tree_genSHORTOUT=function(tr,n_sim)
 {
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0,0.5,0,0.5,0.5,0.5,0,0,0.5,0.5,0.5,0.5,0,0,0.5,0.5,0.5,0,0.5,0),c(0.05,1,1,1,1,1,0.05,1,1,1,1,1,1,0.05,1,1,1,1,1,0.05)),ncol=5,byrow=T)
+  boot=matrix(runif(nbranch*n_sim,c(0,0.1,0,0.1,0.1,0.1,0,0,0.1,0.1,0.1,0.1,0,0,0.1,0.1,0.1,0,0.1,0),c(0.05,0.5,0.5,0.5,0.5,0.5,0.05,0.5,0.5,0.5,0.5,0.5,0.5,0.05,0.5,0.5,0.5,0.5,0.5,0.05)),ncol=5,byrow=T)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -200,7 +220,7 @@ tree_genSHORTINT=function(tr,n_sim)
   nbranch=length(tr$edge[,1])
   tr$edge.lengths=rep(0,nbranch)
   tr_newick=unlist(strsplit(write.tree(tr),""))
-  boot=matrix(runif(nbranch*n_sim,c(0,0,0,0,0),c(1,1,0.05,1,1)),ncol=5,byrow=T)
+  boot=matrix(runif(nbranch*n_sim,c(0,0,0,0,0),c(0.5,0.5,0.05,0.5,0.5)),ncol=5,byrow=T)
   pos=which(tr_newick==0)
   trees=data.frame(t(tr_newick))
   trees=trees[rep(1,n_sim),]
@@ -208,6 +228,23 @@ tree_genSHORTINT=function(tr,n_sim)
   tree_list=as.vector(apply(trees,1,paste,collapse=""))
   return(tree_list)
 }
+
+tree_genSHORTULTRA=function(tr,n_sim)
+{
+  nbranch=length(tr$edge[,1])
+  tr$edge.lengths=rep(0,nbranch)
+  tr_newick=unlist(strsplit(write.tree(tr),""))
+  boot=matrix(runif(nbranch*n_sim,c(0,0,0,0,0),c(0.01,0.01,0.01,0.01,0.01)),ncol=5,byrow=T)
+  pos=which(tr_newick==0)
+  trees=data.frame(t(tr_newick))
+  trees=trees[rep(1,n_sim),]
+  trees[,pos]=boot[,1:5]
+  tree_list=as.vector(apply(trees,1,paste,collapse=""))
+  return(tree_list)
+}
+
+
+
 
 
 indelib_gen=function(n_taxa,n_sim,aln_length,parameter,region) # n_sim = number of simulations per topology
@@ -230,23 +267,33 @@ indelib_gen=function(n_taxa,n_sim,aln_length,parameter,region) # n_sim = number 
     ID_TREE=paste("t",rep(iter,n_sim),rep("_sim",times=n_datasets),1:n_datasets,sep="")
     print(iter)
     print("Newick")
-    if (region=="BETA")
+    if (region=="EXP")
     {
-      NEWICK=tree_gen(all_topo[[iter]],n_sim,parameter)
+      NEWICK=tree_genEXP(all_topo[[iter]],n_sim)
     } else if (region == "FA"){
       NEWICK=tree_genFA(all_topo[[iter]],n_sim)
+    } else if (region == "FAT"){
+      NEWICK=tree_genFE(all_topo[[iter]],n_sim)
+    } else if (region == "FAE"){
+      NEWICK=tree_genFAE(all_topo[[iter]],n_sim)
     } else if (region == "FE"){
       NEWICK=tree_genFE(all_topo[[iter]],n_sim)
-    } else if (region == "SHORT"){
-      NEWICK=tree_genSHORT(all_topo[[iter]],n_sim)
+    } else if (region == "FEE"){
+      NEWICK=tree_genFEE(all_topo[[iter]],n_sim)
     } else if (region == "LONG"){
       NEWICK=tree_genLONG(all_topo[[iter]],n_sim)
     } else if (region == "LONGOUT"){
       NEWICK=tree_genLONGOUT(all_topo[[iter]],n_sim)
+    } else if (region == "LONGULTRA"){
+      NEWICK=tree_genLONGULTRA(all_topo[[iter]],n_sim)
+    } else if (region == "SHORT"){
+      NEWICK=tree_genSHORT(all_topo[[iter]],n_sim)
+    } else if (region == "SHORTOUT"){
+      NEWICK=tree_genSHORTOUT(all_topo[[iter]],n_sim)
     } else if (region == "SHORTINT"){
       NEWICK=tree_genSHORTINT(all_topo[[iter]],n_sim)
     } else {
-      NEWICK=tree_genSHORTOUT(all_topo[[iter]],n_sim)
+      NEWICK=tree_genSHORTULTRA(all_topo[[iter]],n_sim)
     }
     print("Done newick")
     write.table(data.frame('[TREE]',ID_TREE,NEWICK),paste(region,"/topo",iter,'/control.txt',sep=""),append=T,quote=F,row.names=F,col.names =F)
@@ -258,7 +305,7 @@ indelib_gen=function(n_taxa,n_sim,aln_length,parameter,region) # n_sim = number 
     write.table(data.frame(PNAME,1,apply(data.frame(ID_TREE,"_",MODEL),1,paste,collapse="")),paste(region,"/topo",iter,'/control.txt',sep=""),append=T,quote=F,row.names=F,col.names =F)
   }
 }
-for (r in c("FA","FE","SHORT","LONG","LONGOUT","SHORTINT","SHORTOUT"))
+for (r in c("EXP","FA","FAT","FAE","FE","FEE","LONG","LONGOUT","LONGULTRA","SHORT","SHORTOUT","SHORTINT","SHORTULTRA"))
 {  
   indelib_gen(as.numeric(args[1]),as.numeric(args[2]),as.numeric(args[3]),as.numeric(args[4]),r)
 }
