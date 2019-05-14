@@ -1,7 +1,6 @@
 #!/usr/bin/env Rscript
 
-### ARGUMENTS: N taxa N_sims Aln_length Parameter of BETA distr
-
+### ARGUMENTS: N taxa N_sims Aln_length
 args = commandArgs(trailingOnly=TRUE)
 library('phangorn')
 library('MCMCpack')
@@ -273,7 +272,7 @@ indelib_gen=function(n_taxa,n_sim,aln_length,parameter,region) # n_sim = number 
     } else if (region == "FA"){
       NEWICK=tree_genFA(all_topo[[iter]],n_sim)
     } else if (region == "FAT"){
-      NEWICK=tree_genFE(all_topo[[iter]],n_sim)
+      NEWICK=tree_genFAT(all_topo[[iter]],n_sim)
     } else if (region == "FAE"){
       NEWICK=tree_genFAE(all_topo[[iter]],n_sim)
     } else if (region == "FE"){
