@@ -59,6 +59,31 @@ boot_viol=function(my_table)
     return(bootreg)
 }
 
+plot_dens=function
+
+FAy=apply(EFE[,20:25],1,max)
+for (col in c("MP","NJ","ML","BI",'CNN'))
+{
+  bind1=as.matrix(cbind(EFE[EFE[,col]!=1,"inter"],FAy[EFE[,col]!=1]))
+  bind2=as.matrix(cbind(EFE$inter,FAy))
+  k1=kde2d(bind1[,1],bind1[,2], n=200,lims = c(c(0,1),c(min(bind2[,2]),max(bind2[,2]))))
+  k2=kde2d(bind2[,1],bind2[,2], n=200,lims = c(c(0,1),c(min(bind2[,2]),max(bind2[,2]))))
+  k1$z=k1$z/k2$z
+  image(k1, col=gnuplot(1000),yaxs="i",main=col,cex.axis=0.7)
+  lines(bind1,type="p",pch=21,cex=0.3,bg="gray",lwd=0.3)
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 tt=read.table("/Users/anton/Downloads/gapregions_1000.table")
@@ -112,9 +137,17 @@ for(z in unique(tt$zone))
 }
 
 
+###MAIN FIGS
+
+###Zones
+quartz(width=7.7, height=11)
+par(mfcol=c(7,4),mar=c(2,3,2,1))
+
 #FA
 bootreg=z_list[["FA"]][["z_boot"]]
 vioplot(bootreg[,1],bootreg[,2],bootreg[,3],bootreg[,4],bootreg[,5],col="grey",pchMed=16,names=NA,ylim=c(0.53,1.02))
 mtext("Accuracy",2,padj=-3,cex=0.7)
 mtext(c("MP","NJ","ML","BI","CNN"),1,at=seq(1,5),padj=1,cex=0.6)
 text(1:5,apply(bootreg,2,max)+0.017,z_list[["FA"]][["z_acc"]],digits=3),cex=0.7,xpd = TRUE,col="red")
+
+
