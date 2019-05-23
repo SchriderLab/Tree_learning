@@ -77,7 +77,6 @@ def build_standartCNN(X_train, Y_train, X_valid, Y_valid, Ntaxa,batch_sizes,mode
     callback1=EarlyStopping(monitor='val_loss', min_delta=0.001, patience=10, verbose=1, mode='auto')
     callback2=ModelCheckpoint('best_weights_clas', monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=1)
     #Run
-
     model_cnn.fit(x=X_train,y=Y_train,validation_data=(X_valid,Y_valid),batch_size=batch_sizes,callbacks=[callback1,callback2],epochs=200,verbose=1,shuffle=True)
     return(model_cnn)
 
