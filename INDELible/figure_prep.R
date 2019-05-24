@@ -59,18 +59,36 @@ boot_viol=function(my_table)
     return(bootreg)
 }
 
-plot_dens=function
-
-FAy=apply(EFE[,20:25],1,max)
-for (col in c("MP","NJ","ML","BI",'CNN'))
+plot_dens=function(zonetab,zone,y,xlim,n,title)
 {
-  bind1=as.matrix(cbind(EFE[EFE[,col]!=1,"inter"],FAy[EFE[,col]!=1]))
-  bind2=as.matrix(cbind(EFE$inter,FAy))
-  k1=kde2d(bind1[,1],bind1[,2], n=200,lims = c(c(0,1),c(min(bind2[,2]),max(bind2[,2]))))
-  k2=kde2d(bind2[,1],bind2[,2], n=200,lims = c(c(0,1),c(min(bind2[,2]),max(bind2[,2]))))
-  k1$z=k1$z/k2$z
-  image(k1, col=gnuplot(1000),yaxs="i",main=col,cex.axis=0.7)
-  lines(bind1,type="p",pch=21,cex=0.3,bg="gray",lwd=0.3)
+    ztab=zonetab[zonetab$zone==zone,]
+    ztab$y_axis=y
+    for (col in c("MP","NJ","ML","BI",'CNN'))
+    {
+      bind1=ztab[ztab[,col]!=1,c("inter","y_axis")]
+      bind2=as.matrix(ztab[,c("inter","y_axis")])
+      k1=kde2d(bind1[,1],bind1[,2], n=200,lims = c(c(0,xlim),c(min(bind2[,2]),max(bind2[,2]))))
+      k2=kde2d(bind2[,1],bind2[,2], n=200,lims = c(c(0,xlim),c(min(bind2[,2]),max(bind2[,2]))))
+      k1$z=k1$z/k2$z
+      if (title == 1)
+      {
+          image(k1, col=inferno(2000),yaxs="i",main="",cex.axis=0.8)
+          title(col,adj=0,line=0.5)
+      }else{
+          image(k1, col=inferno(2000),yaxs="i",main="",cex.axis=0.8)
+      }    
+      lines(bind1,type="p",pch=21,cex=0.3,bg="gray",lwd=0.3)
+
+    }
+}
+
+plot_viol=function(z_list,zone,ylim1,ylim2,laby,topviol)
+{    
+    bootreg=z_list[[zone]][["z_boot"]]
+    vioplot(bootreg[,1],bootreg[,2],bootreg[,3],bootreg[,4],bootreg[,5],col="grey",pchMed=16,names=NA,ylim=c(ylim1,ylim2))
+    mtext(laby,2,padj=-3,cex=0.7)
+    mtext(c("MP","NJ","ML","BI","CNN"),1,at=seq(1,5),padj=1,cex=0.6)
+    text(1:5,apply(bootreg,2,max)+topviol,round(z_list[[zone]][["z_acc"]],digits=3),cex=0.7,xpd = TRUE,col="red")
 }
 
 
@@ -81,50 +99,47 @@ for (col in c("MP","NJ","ML","BI",'CNN'))
 
 
 
+table_prep=function(path_tab)
+{    
+    tt=read.table(path_tab)
+    names(tt)=c("ID","true_T","model","I","G","pars","nj","ml","bi","CNN_class")
+    tt$zone=rep(c( "EXP", "FA", "FAE" ,"FAT", "FE", "FEE","LONG","LONGOUT","LONGULTRA","SHORT","SHORTINT","SHORTOUT","SHORTULTRA"),each=3000)
 
+    #Read newicks
+    master=read.tree(text=as.character(tt$true_T))
+    pars=read.tree(text=as.character(tt$pars))
+    nj=read.tree(text=as.character(tt$nj))
+    ml=read.tree(text=as.character(tt$ml))
+    ba=read.tree(text=as.character(tt$bi))
 
+    #Calculate RF
+    RF=c()
+    for (i in 1:length(master))
+    {
+      treerf=RF.dist(c(pars[[i]],nj[[i]],ml[[i]],ba[[i]]),master[[i]])
+      RF=rbind(RF,treerf)
+      print(i)
+    } 
 
+    tt=cbind(tt,data.frame(RF)+1)
+    tt$X5=as.numeric(tt$CNN_class==rep(rep(c(0,1,2),times=c(1000,1000,1000)),13))
+    tt[,c("X1","X2","X3","X4",'X5')]=ifelse(tt[,c("X1","X2","X3","X4",'X5')]!=1,0,1)
 
-
-tt=read.table("/Users/anton/Downloads/gapregions_1000.table")
-names(tt)=c("ID","true_T","model","I","G","pars","nj","ml","bi","CNN_class")
-tt$zone=rep(c( "EXP", "FA", "FAE" ,"FAT", "FE", "FEE","LONG","LONGOUT","LONGULTRA","SHORT","SHORTINT","SHORTOUT","SHORTULTRA"),each=3000)
-
-#Read newicks
-master=read.tree(text=as.character(tt$true_T))
-pars=read.tree(text=as.character(tt$pars))
-nj=read.tree(text=as.character(tt$nj))
-ml=read.tree(text=as.character(tt$ml))
-ba=read.tree(text=as.character(tt$bi))
-
-#Calculate RF
-RF=c()
-for (i in 1:length(master))
-{
-  treerf=RF.dist(c(pars[[i]],nj[[i]],ml[[i]],ba[[i]]),master[[i]])
-  RF=rbind(RF,treerf)
-  print(i)
-} 
-
-tt=cbind(tt,data.frame(RF)+1)
-tt$X5=as.numeric(tt$CNN_class==rep(rep(c(0,1,2),times=c(1000,1000,1000)),13))
-tt[,c("X1","X2","X3","X4",'X5')]=ifelse(tt[,c("X1","X2","X3","X4",'X5')]!=1,0,1)
-
-###Extract branch lengths
-mm=unlist(strsplit(gsub("[:|,|[A-Z]|\\(|\\)|;| "," ",tt$true_T),split=" "))
-br_l=data.frame(matrix(as.numeric(mm[mm!=""]),ncol=5,byrow=T),stringsAsFactors=F)
-names(br_l)=c("A","B","inter","C","D")
-tt=cbind(tt,br_l)
-names(tt)[12:16]=c("MP","NJ","ML","BI","CNN")
-tt$AB=tt$A+tt$B
-tt$CD=tt$C+tt$D
-tt$AC=tt$A+tt$C
-tt$AD=tt$A+tt$D
-tt$BC=tt$B+tt$C
-tt$BC=tt$B+tt$C
-tt$BD=tt$B+tt$D
-tt$ABCD=tt$AB+tt$CD
-
+    ###Extract branch lengths
+    mm=unlist(strsplit(gsub("[:|,|[A-Z]|\\(|\\)|;| "," ",tt$true_T),split=" "))
+    br_l=data.frame(matrix(as.numeric(mm[mm!=""]),ncol=5,byrow=T),stringsAsFactors=F)
+    names(br_l)=c("A","B","inter","C","D")
+    tt=cbind(tt,br_l)
+    names(tt)[12:16]=c("MP","NJ","ML","BI","CNN")
+    tt$AB=tt$A+tt$B
+    tt$CD=tt$C+tt$D
+    tt$AC=tt$A+tt$C
+    tt$AD=tt$A+tt$D
+    tt$BC=tt$B+tt$C
+    tt$BC=tt$B+tt$C
+    tt$BD=tt$B+tt$D
+    tt$ABCD=tt$AB+tt$CD
+}
 
 ###Accuracy
 z_list=list()
@@ -136,18 +151,31 @@ for(z in unique(tt$zone))
     z_list[[z]]=list(z_acc=zacc,z_boot=zboot)   
 }
 
-
+"/Users/anton/Downloads/gapregions_1000.table"
 ###MAIN FIGS
 
 ###Zones
 quartz(width=7.7, height=11)
 par(mfcol=c(7,4),mar=c(2,3,2,1))
-
 #FA
-bootreg=z_list[["FA"]][["z_boot"]]
-vioplot(bootreg[,1],bootreg[,2],bootreg[,3],bootreg[,4],bootreg[,5],col="grey",pchMed=16,names=NA,ylim=c(0.53,1.02))
-mtext("Accuracy",2,padj=-3,cex=0.7)
-mtext(c("MP","NJ","ML","BI","CNN"),1,at=seq(1,5),padj=1,cex=0.6)
-text(1:5,apply(bootreg,2,max)+0.017,z_list[["FA"]][["z_acc"]],digits=3),cex=0.7,xpd = TRUE,col="red")
-
-
+plot_topo(c(1,1,0,0,0),"a) Farris zone",expression('B'[5]),expression('B'[1+2]))
+plot_viol(z_list,"FA",0.53,1.02,"Accuracy",0.017)
+y=as.numeric(apply(tt[tt$zone=="FA",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FA",y,0.05,200,1)
+#FAT 
+plot_topo(c(1,1,0,0,0),"b) Twisted Farris zone",expression('B'[5]),expression('B'[1+2]))
+plot_viol(z_list,"FAT",0.52,1.02,"",0.02)
+y=as.numeric(apply(tt[tt$zone=="FAT",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FAT",y,0.05,200,0)
+#FE
+plot_topo(c(1,0,0,1,0),"c) Felsenstein zone",expression('B'[5]),expression('B'[1+3]))
+plot_viol(z_list,"FE",0.1,0.8,"",0.027)
+y=as.numeric(apply(tt[tt$zone=="FE",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FE",y,0.05,200,0)
+#SHORTINT
+plot_topo(c(1,1,0,1,1),"d) Short internal branch",expression('B'[5]),expression('B'[1+2+3+4]))
+plot_viol(z_list,"SHORTINT",0.45,0.71,"",0.013)
+y=as.numeric(tt[tt$zone=="SHORTINT","ABCD"])
+plot_dens(tt,"SHORTINT",y,0.05,200,0)
+quartz.save("Bias_gap.jpeg", type = "jpeg",antialias=F,bg="white",dpi=400,pointsize=12)
+dev.off()
