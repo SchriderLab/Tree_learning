@@ -3,6 +3,7 @@ import tensorflow as tf
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 from itertools import product
 import sys, argparse, os
+import time
 import numpy as np
 from math import log
 from scipy.stats import multinomial, chi2
@@ -119,8 +120,6 @@ def main():
     
     evals = model_cnn.evaluate(test_data1,test_label,batch_size=100, verbose=1, steps=None)
     classes = model_cnn.predict(test_data1, batch_size=100, verbose=1, steps=None)
-    endtime=time.time()
-    print(endtime-starttime,"sec for testing")
     np.savetxt("test.evals_class.txt",evals,fmt='%f')
     np.savetxt("test.classprobs_class.txt",classes,fmt='%f')
     class_lab = classes.argmax(axis=-1)
