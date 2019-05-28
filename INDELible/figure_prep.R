@@ -13,6 +13,35 @@ library("corrplot")
 library("ggtern")
 library("ggpubr")
 
+
+color.bar <- function(lut, min, max=-min, nticks=3, ticks=seq(min, max, len=nticks), title='') {
+  scale = (length(lut)-1)/(max-min)
+  
+  #quartz()
+  lines(c(0,10), c(min,max), type='n', bty='n', xaxt='n', xlab='', yaxt='n', ylab='', main=title)
+  axis(2, ticks, las=1,cex.axis=0.6)
+  for (i in 1:(length(lut)-1)) {
+    y = (i-1)/scale + min
+    rect(0,y,10,y+1/scale, col=lut[i], border=NA)
+  }
+}
+color.bar(inferno(1000),0,1)
+quartz.save("heatlegend.pdf", type = "pdf",antialias=F,bg="white",dpi=800,pointsize=12)
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 plot_topo=function(brl,namezone,xlabz,ylabz)
 {
   plot(1,1,xlim=c(0.4,1.6),ylim=c(0.6,1.4),col="white",xaxt='n',yaxt='n',main=namezone,xlab="",ylab="")
@@ -139,18 +168,22 @@ table_prep=function(path_tab)
     tt$BC=tt$B+tt$C
     tt$BD=tt$B+tt$D
     tt$ABCD=tt$AB+tt$CD
+    return(tt)
 }
 
 ###Accuracy
-z_list=list()
-for(z in unique(tt$zone))
+acc_get=function(tt)
 {
-    print(z)
-    zacc=apply(tt[tt$zone==z,c("MP","NJ","ML","BI","CNN")],2,mean)
-    zboot=boot_viol(tt[tt$zone==z,c("MP","NJ","ML","BI","CNN")])
-    z_list[[z]]=list(z_acc=zacc,z_boot=zboot)   
+    z_list=list()
+    for(z in unique(tt$zone))
+    {
+        print(z)
+        zacc=apply(tt[tt$zone==z,c("MP","NJ","ML","BI","CNN")],2,mean)
+        zboot=boot_viol(tt[tt$zone==z,c("MP","NJ","ML","BI","CNN")])
+        z_list[[z]]=list(z_acc=zacc,z_boot=zboot)   
+    }
+    return(z_list)
 }
-
 "/Users/anton/Downloads/gapregions_1000.table"
 ###MAIN FIGS
 
@@ -159,17 +192,17 @@ quartz(width=7.7, height=11)
 par(mfcol=c(7,4),mar=c(2,3,2,1))
 #FA
 plot_topo(c(1,1,0,0,0),"a) Farris zone",expression('B'[5]),expression('B'[1+2]))
-plot_viol(z_list,"FA",0.53,1.02,"Accuracy",0.017)
+plot_viol(z_list,"FA",0.53,1.02,"Accuracy",0.023)
 y=as.numeric(apply(tt[tt$zone=="FA",c("AB","CD","AC","AD","BC","BD")],1,max))
 plot_dens(tt,"FA",y,0.05,200,1)
 #FAT 
 plot_topo(c(1,1,0,0,0),"b) Twisted Farris zone",expression('B'[5]),expression('B'[1+2]))
-plot_viol(z_list,"FAT",0.52,1.02,"",0.02)
+plot_viol(z_list,"FAT",0.52,1.02,"",0.023)
 y=as.numeric(apply(tt[tt$zone=="FAT",c("AB","CD","AC","AD","BC","BD")],1,max))
 plot_dens(tt,"FAT",y,0.05,200,0)
 #FE
 plot_topo(c(1,0,0,1,0),"c) Felsenstein zone",expression('B'[5]),expression('B'[1+3]))
-plot_viol(z_list,"FE",0.1,0.8,"",0.027)
+plot_viol(z_list,"FE",0.1,0.8,"",0.03)
 y=as.numeric(apply(tt[tt$zone=="FE",c("AB","CD","AC","AD","BC","BD")],1,max))
 plot_dens(tt,"FE",y,0.05,200,0)
 #SHORTINT
@@ -178,4 +211,32 @@ plot_viol(z_list,"SHORTINT",0.45,0.71,"",0.013)
 y=as.numeric(tt[tt$zone=="SHORTINT","ABCD"])
 plot_dens(tt,"SHORTINT",y,0.05,200,0)
 quartz.save("Bias_gap.jpeg", type = "jpeg",antialias=F,bg="white",dpi=400,pointsize=12)
+dev.off()
+
+
+
+###Zones
+quartz(width=7.7, height=11)
+par(mfcol=c(7,4),mar=c(2,3,2,1))
+#FA
+plot_topo(c(1,1,0,0,0),"a) Farris zone",expression('B'[5]),expression('B'[1+2]))
+plot_viol(z_list,"FA",0.53,1.02,"Accuracy",0.023)
+y=as.numeric(apply(tt[tt$zone=="FA",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FA",y,0.05,200,1)
+#FAT 
+plot_topo(c(1,1,0,0,0),"b) Twisted Farris zone",expression('B'[5]),expression('B'[1+2]))
+plot_viol(z_list,"FAT",0.52,1.02,"",0.023)
+y=as.numeric(apply(tt[tt$zone=="FAT",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FAT",y,0.05,200,0)
+#FE
+plot_topo(c(1,0,0,1,0),"c) Felsenstein zone",expression('B'[5]),expression('B'[1+3]))
+plot_viol(z_list,"FE",0.1,0.8,"",0.03)
+y=as.numeric(apply(tt[tt$zone=="FE",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FE",y,0.05,200,0)
+#SHORTINT
+plot_topo(c(1,1,0,1,1),"d) Short internal branch",expression('B'[5]),expression('B'[1+2+3+4]))
+plot_viol(z_list,"SHORTINT",0.45,0.71,"",0.013)
+y=as.numeric(tt[tt$zone=="SHORTINT","ABCD"])
+plot_dens(tt,"SHORTINT",y,0.05,200,0)
+quartz.save("Bias_nogap.jpeg", type = "jpeg",antialias=F,bg="white",dpi=400,pointsize=12)
 dev.off()
