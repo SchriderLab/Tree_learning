@@ -187,7 +187,7 @@ acc_get=function(tt)
 "/Users/anton/Downloads/gapregions_1000.table"
 ###MAIN FIGS
 
-###Zones
+###Zones GAPS
 quartz(width=7.7, height=11)
 par(mfcol=c(7,4),mar=c(2,3,2,1))
 #FA
@@ -215,7 +215,7 @@ dev.off()
 
 
 
-###Zones
+###Zones NOGAPS
 quartz(width=7.7, height=11)
 par(mfcol=c(7,4),mar=c(2,3,2,1))
 #FA
@@ -239,4 +239,59 @@ plot_viol(z_list,"SHORTINT",0.45,0.71,"",0.013)
 y=as.numeric(tt[tt$zone=="SHORTINT","ABCD"])
 plot_dens(tt,"SHORTINT",y,0.05,200,0)
 quartz.save("Bias_nogap.jpeg", type = "jpeg",antialias=F,bg="white",dpi=400,pointsize=12)
+dev.off()
+
+
+
+##SUPPL FIGS GAP / NOGAP
+quartz(width=10.6, height=10.1)
+par(mfrow=c(8,7),mar=c(2,2,2,2))
+#FAE
+plot_topo(c(1,1,1,0,0),"a) Extended \nFarris zone",expression('B'[5]),expression('B'[1+2]))
+plot_viol(z_list,"FAE",0.8,1.02,"Accuracy",0.023)
+y=as.numeric(apply(tt[tt$zone=="FAE",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FAE",y,0.5,200,1)
+
+#FEE
+plot_topo(c(1,0,1,1,0),"b) Extended \nFelsenstein zone",expression('B'[5]),expression('B'[1+3]))
+plot_viol(z_list,"FEE",0.7,1.02,"Accuracy",0.023)
+y=as.numeric(apply(tt[tt$zone=="FEE",c("AB","CD","AC","AD","BC","BD")],1,max))
+plot_dens(tt,"FEE",y,0.5,200,1)
+
+#LONG
+plot_topo(c(1,1,1,1,1),"c) Long branches",expression('B'[5]),expression('B'[1+2+3+4]))
+plot_viol(z_list,"LONG",0.7,1.02,"Accuracy",0.023)
+y=as.numeric(tt[tt$zone=="LONG","ABCD"])
+plot_dens(tt,"LONG",y,0.5,200,1)
+
+#LONGULTRA
+plot_topo(c(1,1,1,1,1),"d) Extra-long branches",expression('B'[5]),expression('B'[1+2+3+4]))
+plot_viol(z_list,"LONGULTRA",0.6,1,"Accuracy",0.023)
+y=as.numeric(tt[tt$zone=="LONGULTRA","ABCD"])
+plot_dens(tt,"LONGULTRA",y,1,200,1)
+
+#LONGOUT
+plot_topo(c(1,0,1,0,0),"e) Single long branch",expression('B'[5]),expression('B'[1]))
+plot_viol(z_list,"LONGOUT",0.8,1.02,"Accuracy",0.023)
+y=as.numeric(apply(tt[tt$zone=="LONGOUT",c("A","B","C","D")],1,max))
+plot_dens(tt,"LONGOUT",y,0.5,200,1)
+
+#SHORT
+plot_topo(c(0,0,1,0,0),"f) Short branches",expression('B'[5]),expression('B'[1+2+3+4]))
+plot_viol(z_list,"SHORT",0.96,1,"Accuracy",0.004)
+y=as.numeric(tt[tt$zone=="SHORT","ABCD"])
+plot_dens(tt,"SHORT",y,0.5,200,1)
+
+#SHORTULTRA
+plot_topo(c(0,0,0,0,0),"g) Extra-short branches",expression('B'[5]),expression('B'[1+2+3+4]))
+plot_viol(z_list,"SHORTULTRA",0.6,1,"Accuracy",0.023)
+y=as.numeric(tt[tt$zone=="SHORTULTRA","ABCD"])
+plot_dens(tt,"SHORTULTRA",y,0.01,200,1)
+
+#SHORTOUT
+plot_topo(c(0,1,1,1,1),"e) Single short branch",expression('B'[5]),expression('B'[1]))
+plot_viol(z_list,"SHORTOUT",0.8,1.02,"Accuracy",0.023)
+y=as.numeric(apply(tt[tt$zone=="SHORTOUT",c("A","B","C","D","BC")],1,min))
+plot_dens(tt,"SHORTOUT",y,0.5,200,1)
+quartz.save("Suppl_Bias_gap.jpeg", type = "jpeg",antialias=F,bg="white",dpi=400,pointsize=12)
 dev.off()
