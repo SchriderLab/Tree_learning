@@ -88,6 +88,20 @@ boot_viol=function(my_table)
     return(bootreg)
 }
 
+boot_viol_big=function(my_table)
+{    
+    bootreg=c()
+    for (b in 1:1000)
+    {
+      tabboot=my_table[,"X5"]
+      boot=mean(sample(tabboot,replace=T))
+      bootreg=rbind(bootreg,boot)
+    } 
+    return(bootreg)
+}
+
+
+
 plot_dens=function(zonetab,zone,y,xlim,n,title)
 {
     ztab=zonetab[zonetab$zone==zone,]
@@ -219,6 +233,9 @@ acc_get=function(tt)
     }
     return(z_list)
 }
+
+
+
 "/Users/anton/Downloads/gapregions_1000.table"
 ###MAIN FIGS
 
@@ -334,12 +351,37 @@ dev.off()
 #MAIN FIGS ACCURACY PINV GAMMA
 
 #read gap table
-tt_gap=table_prep_master( "/Users/antonsuvorov/Downloads/master_regions_gap_cnn","/Users/antonsuvorov/Downloads/master_regions_gap_classic")
-tt_nogap=table_prep_master( "/Users/antonsuvorov/Downloads/master_regions_nogap_cnn","/Users/antonsuvorov/Downloads/master_regions_nogap_classic")
+tt_gap=table_prep_master( "~/Downloads/master_regions_gap_cnn","~/Downloads/master_regions_gap_classic")
+tt_nogap=table_prep_master( "~/Downloads/master_regions_nogap_cnn","~/Downloads/master_regions_nogap_classic")
 tt_gap$zone="TOTAL"
 tt_nogap$zone="TOTAL"
 gap_acc=acc_get(tt_gap)
 nogap_acc=acc_get(tt_nogap)
+nogap150k=read.table("~/Downloads/150k.classeslab_class.txt")
+nogap300k=read.table("~/Downloads/300k.classeslab_class.txt")
+
+nogap150k$X5=as.numeric(nogap150k$V1==rep(c(0,1,2),times=c(5000,5000,5000)))
+nogap150k[,'X5']=ifelse(nogap150k[,'X5']!=1,0,1)
+
+nogap300k$X5=as.numeric(nogap300k$V1==rep(c(0,1,2),times=c(5000,5000,5000)))
+nogap300k[,'X5']=ifelse(nogap300k[,'X5']!=1,0,1)
+
+nogap150k=nogap150k[sample(1:15000,size=3000),]
+nogap300k=nogap300k[sample(1:15000,size=3000),]
+
+nogap150kboot=boot_viol_big(nogap150k)
+nogap300kboot=boot_viol_big(nogap300k)
+acc150k=mean(nogap150k$X5)
+acc300k=mean(nogap300k$X5)
+
 
 #Accuracy
-vioplot(gap_acc$TOTAL$z_boot[,1],gap_acc$TOTAL$z_boot[,2],gap_acc$TOTAL$z_boot[,3],gap_acc$TOTAL$z_boot[,4],gap_acc$TOTAL$z_boot[,5],nogap_acc$TOTAL$z_boot[,1],nogap_acc$TOTAL$z_boot[,2],nogap_acc$TOTAL$z_boot[,3],nogap_acc$TOTAL$z_boot[,4],nogap_acc$TOTAL$z_boot[,5],col=c(rep("grey",5),rep("black",5)),pchMed=16,names=c("MP","NJ","ML","BI","CNN","MP","NJ","ML","BI","CNN"))
+vioplot(gap_acc$TOTAL$z_boot[,1],gap_acc$TOTAL$z_boot[,2],gap_acc$TOTAL$z_boot[,3],gap_acc$TOTAL$z_boot[,4],gap_acc$TOTAL$z_boot[,5],nogap_acc$TOTAL$z_boot[,1],nogap_acc$TOTAL$z_boot[,2],nogap_acc$TOTAL$z_boot[,3],nogap_acc$TOTAL$z_boot[,4],nogap_acc$TOTAL$z_boot[,5],nogap150kboot[,1],nogap300kboot[,1],col=c(rep("grey45",5),rep("grey80",7)),pchMed=16,names=c(rep("",12)))
+text(x=1:12, 0.655, labels=c("MP","NJ","ML","BI","CNN","MP","NJ","ML","BI","CNN50k","CNN150k","CNN300k"),srt = 45, pos = 1, xpd = TRUE,cex=0.8)
+legend("topright",legend=c("gapped","ungapped"),col=c("grey45","grey80"),pch=19,cex=0.8)
+title(ylab="Accuracy")
+text(1:12,apply(cbind(gap_acc$TOTAL$z_boot,nogap_acc$TOTAL$z_boot,nogap150kboot,nogap300kboot),2,max)+0.004,round(c(gap_acc$TOTAL$z_acc,nogap_acc$TOTAL$z_acc,acc150k,acc300k),digits=3),cex=0.6)
+
+#Invariant + Gamma
+
+pinvar=data.frame(inv=tt_gap[,"I"],method=rep(c("MP","NJ","ML","BI","CNN"),each=3000),inf=ifelse(as.vector(as.matrix(tt[,c("MP","NJ","ML","BI","CNN")]))==1,"correct","incorrect"))
