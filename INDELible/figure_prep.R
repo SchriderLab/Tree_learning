@@ -122,11 +122,8 @@ plot_viol=function(z_list,zone,ylim1,ylim2,laby,topviol)
 
 
 
-
-
-
-
-
+###Get bootstrap values
+getBoot= function(x){boot=c(); for (phy in x) {boot=c(boot,phy$node.label[2])};boot=as.numeric(gsub(".*/","",boot));return(boot)}
 
 table_prep=function(path_tab)
 {    
@@ -170,6 +167,44 @@ table_prep=function(path_tab)
     tt$ABCD=tt$AB+tt$CD
     return(tt)
 }
+
+table_prep_master=function(path_tab_cnn,path_tab_classic)
+{    
+    tt1cnn=read.table(path_tab_cnn)
+    tt1classic=read.table(path_tab_classic)
+    tt1cnn=tt1cnn[c(1:1000,5001:6000,10001:11000),]
+    tt1=cbind(tt1cnn,tt1classic)
+    names(tt1)=c("ID","true_T","model","I","G","CNN_class","CPP1","CPP2","CPP3","CBP","pars","nj","ml","bi")
+    tt=tt1
+    #Read newicks
+    master=read.tree(text=as.character(tt$true_T))
+    pars=read.tree(text=as.character(tt$pars))
+    nj=read.tree(text=as.character(tt$nj))
+    ml=read.tree(text=as.character(tt$ml))
+    ba=read.tree(text=as.character(tt$bi))
+    
+    #Get bootstrap
+    tt$pars_bs=getBoot(pars)/100
+    tt$nj_bs=getBoot(nj)/100
+    tt$ml_bs=getBoot(ml)/100
+    tt$bi_pp=getBoot(ba)
+    
+    #Calculate RF
+    RF=c()
+    for (i in 1:length(master))
+    {
+      treerf=RF.dist(c(pars[[i]],nj[[i]],ml[[i]],ba[[i]]),master[[i]])
+      RF=rbind(RF,treerf)
+      print(i)
+    } 
+
+    tt=cbind(tt,data.frame(RF)+1)
+    tt$X5=as.numeric(tt$CNN_class==rep(c(0,1,2),times=c(1000,1000,1000)))
+    tt[,c("X1","X2","X3","X4",'X5')]=ifelse(tt[,c("X1","X2","X3","X4",'X5')]!=1,0,1)
+    names(tt)[19:23]=c("MP","NJ","ML","BI","CNN")
+    return(tt)
+}
+
 
 ###Accuracy
 acc_get=function(tt)
@@ -295,3 +330,16 @@ y=as.numeric(apply(tt[tt$zone=="SHORTOUT",c("A","B","C","D","BC")],1,min))
 plot_dens(tt,"SHORTOUT",y,0.5,200,1)
 quartz.save("Suppl_Bias_gap.jpeg", type = "jpeg",antialias=F,bg="white",dpi=400,pointsize=12)
 dev.off()
+
+#MAIN FIGS ACCURACY PINV GAMMA
+
+#read gap table
+tt_gap=table_prep_master( "/Users/antonsuvorov/Downloads/master_regions_gap_cnn","/Users/antonsuvorov/Downloads/master_regions_gap_classic")
+tt_nogap=table_prep_master( "/Users/antonsuvorov/Downloads/master_regions_nogap_cnn","/Users/antonsuvorov/Downloads/master_regions_nogap_classic")
+tt_gap$zone="TOTAL"
+tt_nogap$zone="TOTAL"
+gap_acc=acc_get(tt_gap)
+nogap_acc=acc_get(tt_nogap)
+
+#Accuracy
+vioplot(gap_acc$TOTAL$z_boot[,1],gap_acc$TOTAL$z_boot[,2],gap_acc$TOTAL$z_boot[,3],gap_acc$TOTAL$z_boot[,4],gap_acc$TOTAL$z_boot[,5],nogap_acc$TOTAL$z_boot[,1],nogap_acc$TOTAL$z_boot[,2],nogap_acc$TOTAL$z_boot[,3],nogap_acc$TOTAL$z_boot[,4],nogap_acc$TOTAL$z_boot[,5],col=c(rep("grey",5),rep("black",5)),pchMed=16,names=c("MP","NJ","ML","BI","CNN","MP","NJ","ML","BI","CNN"))
