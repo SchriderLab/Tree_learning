@@ -182,14 +182,11 @@ table_prep=function(path_tab)
     return(tt)
 }
 
-table_prep_master=function(path_tab_cnn,path_tab_classic)
+table_prep_master=function(path_tab)
 {    
-    tt1cnn=read.table(path_tab_cnn)
-    tt1classic=read.table(path_tab_classic)
-    tt1cnn=tt1cnn[c(1:1000,5001:6000,10001:11000),]
-    tt1=cbind(tt1cnn,tt1classic)
-    names(tt1)=c("ID","true_T","model","I","G","CNN_class","CPP1","CPP2","CPP3","CBP","pars","nj","ml","bi")
-    tt=tt1
+    tt=read.table(path_tab)
+    
+    names(tt)=c("ID","true_T","model","I","G","pars","nj","ml","bi","CNN_class","CPP1","CPP2","CPP3","CNN_bs")
     #Read newicks
     master=read.tree(text=as.character(tt$true_T))
     pars=read.tree(text=as.character(tt$pars))
@@ -213,7 +210,7 @@ table_prep_master=function(path_tab_cnn,path_tab_classic)
     } 
 
     tt=cbind(tt,data.frame(RF)+1)
-    tt$X5=as.numeric(tt$CNN_class==rep(c(0,1,2),times=c(1000,1000,1000)))
+    tt$X5=as.numeric(tt$CNN_class==rep(c(0,1,2),times=c(5000,5000,5000)))
     tt[,c("X1","X2","X3","X4",'X5')]=ifelse(tt[,c("X1","X2","X3","X4",'X5')]!=1,0,1)
     names(tt)[19:23]=c("MP","NJ","ML","BI","CNN")
     return(tt)
@@ -351,8 +348,8 @@ dev.off()
 #MAIN FIGS ACCURACY PINV GAMMA
 
 #read gap table
-tt_gap=table_prep_master( "~/Downloads/master_regions_gap_cnn","~/Downloads/master_regions_gap_classic")
-tt_nogap=table_prep_master( "~/Downloads/master_regions_nogap_cnn","~/Downloads/master_regions_nogap_classic")
+tt_gap=table_prep_master( "~/Downloads/master_regions_gap")
+tt_nogap=table_prep_master( "~/Downloads/master_regions_nogap")
 tt_gap$zone="TOTAL"
 tt_nogap$zone="TOTAL"
 gap_acc=acc_get(tt_gap)
@@ -366,9 +363,6 @@ nogap150k[,'X5']=ifelse(nogap150k[,'X5']!=1,0,1)
 nogap300k$X5=as.numeric(nogap300k$V1==rep(c(0,1,2),times=c(5000,5000,5000)))
 nogap300k[,'X5']=ifelse(nogap300k[,'X5']!=1,0,1)
 
-nogap150k=nogap150k[sample(1:15000,size=3000),]
-nogap300k=nogap300k[sample(1:15000,size=3000),]
-
 nogap150kboot=boot_viol_big(nogap150k)
 nogap300kboot=boot_viol_big(nogap300k)
 acc150k=mean(nogap150k$X5)
@@ -376,12 +370,44 @@ acc300k=mean(nogap300k$X5)
 
 
 #Accuracy
-vioplot(gap_acc$TOTAL$z_boot[,1],gap_acc$TOTAL$z_boot[,2],gap_acc$TOTAL$z_boot[,3],gap_acc$TOTAL$z_boot[,4],gap_acc$TOTAL$z_boot[,5],nogap_acc$TOTAL$z_boot[,1],nogap_acc$TOTAL$z_boot[,2],nogap_acc$TOTAL$z_boot[,3],nogap_acc$TOTAL$z_boot[,4],nogap_acc$TOTAL$z_boot[,5],nogap150kboot[,1],nogap300kboot[,1],col=c(rep("grey45",5),rep("grey80",7)),pchMed=16,names=c(rep("",12)))
-text(x=1:12, 0.655, labels=c("MP","NJ","ML","BI","CNN","MP","NJ","ML","BI","CNN50k","CNN150k","CNN300k"),srt = 45, pos = 1, xpd = TRUE,cex=0.8)
-legend("topright",legend=c("gapped","ungapped"),col=c("grey45","grey80"),pch=19,cex=0.8)
+vioplot(gap_acc$TOTAL$z_boot[,1],nogap_acc$TOTAL$z_boot[,1],gap_acc$TOTAL$z_boot[,2],nogap_acc$TOTAL$z_boot[,2],gap_acc$TOTAL$z_boot[,3],nogap_acc$TOTAL$z_boot[,3],gap_acc$TOTAL$z_boot[,4],nogap_acc$TOTAL$z_boot[,4],gap_acc$TOTAL$z_boot[,5],nogap_acc$TOTAL$z_boot[,5],nogap150kboot[,1],nogap300kboot[,1],col=c(rep(c("grey45","grey80"),5),rep("grey80",2)),pchMed=16,names=c(rep("",12)))
+text(x=1:12, 0.67, labels=c(rep(c("MP","NJ","ML","BI"),each=2),"CNN50k","CNN50k","CNN150k","CNN300k"),srt = 45, pos = 1, xpd = TRUE,cex=0.8)
+legend("topleft",legend=c("gapped","ungapped"),col=c("grey45","grey80"),pch=19,cex=0.8)
 title(ylab="Accuracy")
-text(1:12,apply(cbind(gap_acc$TOTAL$z_boot,nogap_acc$TOTAL$z_boot,nogap150kboot,nogap300kboot),2,max)+0.004,round(c(gap_acc$TOTAL$z_acc,nogap_acc$TOTAL$z_acc,acc150k,acc300k),digits=3),cex=0.6)
+text(1:12,apply(cbind(gap_acc$TOTAL$z_boot,nogap_acc$TOTAL$z_boot,nogap150kboot,nogap300kboot),2,max)[c(1,6,2,7,3,8,4,9,5,10,11,12)]+0.004,round(c(gap_acc$TOTAL$z_acc,nogap_acc$TOTAL$z_acc,acc150k,acc300k)[c(1,6,2,7,3,8,4,9,5,10,11,12)],digits=3),cex=0.6)
 
 #Invariant + Gamma
 
-pinvar=data.frame(inv=tt_gap[,"I"],method=rep(c("MP","NJ","ML","BI","CNN"),each=3000),inf=ifelse(as.vector(as.matrix(tt[,c("MP","NJ","ML","BI","CNN")]))==1,"correct","incorrect"))
+pinvar1=data.frame(inv=tt_gap[,"I"],method=rep(c("MP","NJ","ML","BI","CNN"),each=15000),inf=ifelse(as.vector(as.matrix(tt_gap[,c("MP","NJ","ML","BI","CNN")]))==1,"correct","incorrect"))
+pinvarpl1=ggplot(pinvar1, aes(x=method, y=inv, fill=inf))+geom_violin(trim=T,size=0.5,bw=0.05)+ theme_classic()+scale_x_discrete(limits=c("MP","NJ","ML","BI","CNN"))+scale_fill_manual(values=c("grey","white"))+geom_boxplot(width=0.1,position=position_dodge(0.9))+
+labs(title="Invariant sites (+I model)", y = expression('p'[inv]),x="",fill = "")+ stat_summary(fun.y=median, geom="point", size=2.5, color="black",position=position_dodge(0.9))+theme(legend.position = c(0.75, 1.1),legend.direction = "horizontal")
+
+pinvar2=data.frame(inv=tt_nogap[,"I"],method=rep(c("MP","NJ","ML","BI","CNN"),each=15000),inf=ifelse(as.vector(as.matrix(tt_nogap[,c("MP","NJ","ML","BI","CNN")]))==1,"correct","incorrect"))
+pinvarpl2=ggplot(pinvar2, aes(x=method, y=inv, fill=inf))+geom_violin(trim=T,size=0.5,bw=0.05)+ theme_classic()+scale_x_discrete(limits=c("MP","NJ","ML","BI","CNN"))+scale_fill_manual(values=c("grey","white"))+geom_boxplot(width=0.1,position=position_dodge(0.9))+
+labs(title="Invariant sites (+I model)", y = expression('p'[inv]),x="",fill = "")+ stat_summary(fun.y=median, geom="point", size=2.5, color="black",position=position_dodge(0.9))+theme(legend.position = "none")
+
+gam1=data.frame(inv=tt_gap[,c("G")],method=rep(c("MP","NJ","ML","BI","CNN"),each=15000),inf=ifelse(as.vector(as.matrix(tt_gap[,c("MP","NJ","ML","BI","CNN")]))==1,"correct","incorrect"))
+gampl1=ggplot(gam1, aes(x=method, y=inv, fill=inf))+geom_violin(trim=T,bw=0.05)+ theme_classic()+scale_x_discrete(limits=c("MP","NJ","ML","BI","CNN"))+scale_fill_manual(values=c("grey","white"))+geom_boxplot(width=0.1,position=position_dodge(0.9))+
+labs(title=expression(paste("Gamma (+",Gamma," model)")), y = expression(alpha),x="",fill = "")+ stat_summary(fun.y=median, geom="point", size=2.5, color="black",position=position_dodge(0.9))+theme(legend.position = "none")
+
+gam2=data.frame(inv=tt_nogap[,c("G")],method=rep(c("MP","NJ","ML","BI","CNN"),each=15000),inf=ifelse(as.vector(as.matrix(tt_nogap[,c("MP","NJ","ML","BI","CNN")]))==1,"correct","incorrect"))
+gampl2=ggplot(gam2, aes(x=method, y=inv, fill=inf))+geom_violin(trim=T,bw=0.05)+ theme_classic()+scale_x_discrete(limits=c("MP","NJ","ML","BI","CNN"))+scale_fill_manual(values=c("grey","white"))+geom_boxplot(width=0.1,position=position_dodge(0.9))+
+labs(title=expression(paste("Gamma (+",Gamma," model)")), y = expression(alpha),x="",fill = "")+ stat_summary(fun.y=median, geom="point", size=2.5, color="black",position=position_dodge(0.9))+theme(legend.position = "none")
+
+ggarrange(pinvarpl1,pinvarpl2,gampl1,gampl2,nrow=2,ncol=2,labels = c("a)", "b)","c)","d)"))
+
+
+#Reliability 
+pro1=apply(tt_gap[,c("CPP1","CPP2","CPP3")],1,max)
+bootboot1=data.frame(boot=as.vector(as.matrix(cbind(tt_gap[,c("pars_bs","nj_bs","ml_bs","bi_pp","CNN_bs")],pro1))),method=rep(c("MP BS","NJ BS","ML BS","Bayes PP","CNN BS","CNN CPP"),each=15000),inf=ifelse(as.vector(as.matrix(tt_gap[,c("MP","NJ","ML","BI","CNN","CNN")]))==1,"correct","incorrect"))
+bootbootpl1=ggplot(bootboot1, aes(x=method, y=boot, fill=inf))+geom_violin(trim=T,bw=0.15)+ theme_classic()+scale_x_discrete(limits=c("MP BS","NJ BS","ML BS","Bayes PP","CNN BS","CNN CPP"))+scale_fill_manual(values=c("grey","white"))+
+geom_boxplot(width=0.05,position=position_dodge(0.9),outlier.shape = NA) +labs(title="", y = "Value of reliability measure",x="",fill = "")+ stat_summary(fun.y=median, geom="point", size=2, color="black",position=position_dodge(0.9))+theme(legend.position = c(0.2, 1.05),legend.direction = "horizontal")
+
+
+pro2=apply(tt_nogap[,c("CPP1","CPP2","CPP3")],1,max)
+bootboot2=data.frame(boot=as.vector(as.matrix(cbind(tt_nogap[,c("pars_bs","nj_bs","ml_bs","bi_pp","CNN_bs")],pro2))),method=rep(c("MP BS","NJ BS","ML BS","Bayes PP","CNN BS","CNN CPP"),each=15000),inf=ifelse(as.vector(as.matrix(tt_nogap[,c("MP","NJ","ML","BI","CNN","CNN")]))==1,"correct","incorrect"))
+bootbootpl2=ggplot(bootboot2, aes(x=method, y=boot, fill=inf))+geom_violin(trim=T,bw=0.15)+ theme_classic()+scale_x_discrete(limits=c("MP BS","NJ BS","ML BS","Bayes PP","CNN BS","CNN CPP"))+scale_fill_manual(values=c("grey","white"))+
+geom_boxplot(width=0.05,position=position_dodge(0.9),outlier.shape = NA) +labs(title="", y = "Value of reliability measure",x="",fill = "")+ stat_summary(fun.y=median, geom="point", size=2, color="black",position=position_dodge(0.9))+theme(legend.position = "none")
+
+ggarrange(bootbootpl1,bootbootpl2,nrow=2,labels = c("a)", "b)"))
+
