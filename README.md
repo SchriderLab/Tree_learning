@@ -22,7 +22,7 @@ Example: ```Rscript indelible_controlgen_REGIONS_INDEL001.R 4 1000 500```(genera
 This script generates control files for MSA simulation with no substitutions, only indels (i.e. p_inv=1). This is the scenario under which maximum likelihood (ML) tree inference has been shown to be statistically inconsistent ([Warnow, 2012](http://currents.plos.org/treeoflife/index.html%3Fp=1609.html)). These MSAs were used to test performance of different tree inference methods.   
 Example: ```Rscript indelible_controlgen_INDEL001_WARNOW.R 4 1000 500``` (generates 1000 MSAs of length 500 per topology)       
 4) [indelible_controlgen_INDEL001_ANTI_WARNOW.R](https://github.com/SchriderLab/Tree_learning/blob/master/INDELible/indelible_controlgen_INDEL001_ANTI_WARNOW.R)   
-This script generates control files for MSA simulation with no substitutions, only indels (i.e. p_inv=1). This is the scenario under which maximum likelihood (ML) tree inference has been shown to be statistically inconsistent ([Warnow, 2012](http://currents.plos.org/treeoflife/index.html%3Fp=1609.html)). These MSAs were used to test performance of different tree inference methods.   
+This script generates control files for MSA simulation with indels and allowing all MSAs sites to vary (i.e. p_inv=0). These MSAs were used to test performance of different tree inference methods.   
 
 Example: ```Rscript indelible_controlgen_INDEL001_WARNOW.R 4 1000 500``` (generates 1000 MSAs of length 500 per topology)  
 **Python scripts** can be found in [KERAS directory](https://github.com/SchriderLab/Tree_learning/tree/master/KERAS). They are used for building, training, validating and testing Convolutional Neuronal Networks (CNNs). These scripts are optimized to run on GPUs.  
