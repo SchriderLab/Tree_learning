@@ -1,4 +1,4 @@
-https://zenodo.org/badge/174181866.svg
+[![DOI](https://zenodo.org/badge/174181866.svg)](https://zenodo.org/badge/latestdoi/174181866)
 # Tree topology inference from multiple sequence alignments using Deep Learning
 
 This repository contains R (>=3.5.0) and Python (>=3.6) scripts that were used in the project ["Accurate inference of tree topologies from multiple sequence alignments using deep learning"](https://www.biorxiv.org/content/10.1101/559054v1) 
