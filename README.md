@@ -3,8 +3,8 @@
 
 This repository contains R (>=3.5.0) and Python (>=3.6) scripts that were used in the project ["Accurate inference of tree topologies from multiple sequence alignments using deep learning"](https://www.biorxiv.org/content/10.1101/559054v1)
 
-Citation:
-Anton Suvorov, Joshua Hochuli, Daniel R. Schrider (2019). Accurate inference of tree topologies from multiple sequence alignments using deep learning. Systematic Biology, ["doi"](https://academic.oup.com/sysbio/advance-article-abstract/doi/10.1093/sysbio/syz060/5559282)  
+**Citation**:    
+Anton Suvorov, Joshua Hochuli, Daniel R. Schrider (2019). Accurate inference of tree topologies from multiple sequence alignments using deep learning. Systematic Biology, [DOI](https://academic.oup.com/sysbio/advance-article-abstract/doi/10.1093/sysbio/syz060/5559282)  
 
 **R scripts** can be found in [INDELible directory](https://github.com/SchriderLab/Tree_learning/tree/master/INDELible). They will generate various control files for [INDElible](http://abacus.gene.ucl.ac.uk/software/indelible/) program that simulates MSAs under given tree topology, branch lengths and different substitution as well as indel model parameters.  
 
